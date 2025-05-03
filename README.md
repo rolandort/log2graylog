@@ -126,7 +126,7 @@ To run the tests:
 mvn test
 ```
 
-## Roadmap
+## Possible Improvements
 
 Planned improvements:
 
@@ -143,10 +143,11 @@ Planned improvements:
   - Fix timestamp handling for historical log entries
   - Improve naming conventions for formatters based on log sources
   - Enhance error handling and reporting
+  - Additional unit tests
 
 ## Author
 
-This project was created by [Roland Ortner](https://www.linkedin.com/in/rolandortner/).
+This project was created by [Roland Ortner](https://www.linkedin.com/in/roland-ortner/).
 
 ## License
 
