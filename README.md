@@ -25,7 +25,7 @@ A command-line tool that parses log messages from files and forwards them to a G
 
 ## Overview
 
-Log2Graylog is a utility for parsing log files and sending their contents to a Graylog server in GELF format. It's designed to be simple to use while providing flexible options for log processing and forwarding.
+Log2Graylog is a utility for parsing log files and sending their contents to a Graylog server in GELF format. 
 
 ![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)
 
