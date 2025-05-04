@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(
     name = "Log2Graylog",
     mixinStandardHelpOptions = true,
-    version = "1.1",
+    version = "1.0",
     description = "Parses log messages and sends them to Graylog using the GELF format."
 )
 public class Log2GraylogCli implements Callable<Integer> {
