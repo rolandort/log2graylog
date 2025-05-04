@@ -87,6 +87,28 @@ Specify a custom Graylog URL:
 java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt --out http://graylog-server:12202/gelf
 ```
 
+Example source log message:
+
+```json
+{
+  "ClientDeviceType": "desktop",
+  "ClientIP": "192.168.211.15",
+  "ClientIPClass": "noRecord",
+  "ClientStatus": 550, 
+  "ClientRequestBytes": 63,
+  "ClientRequestReferer": "torch.sh",
+  "ClientRequestURI": "/search",
+  "ClientRequestUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  "ClientSrcPort":450,
+  "EdgeServerIP": "10.0.88.33",
+  "EdgeStartTimestamp": 1576929197,
+  "DestinationIP": "172.16.45.194",
+  "OriginResponseBytes": 957,
+  "OriginResponseTime": 398000000
+}
+```
+
+
 ## Architecture
 
 Log2Graylog uses a modular architecture with the following components:
@@ -131,12 +153,13 @@ mvn test
   - Configurable HTTP timeouts (currently fixed at 10 seconds)
   - Support for additional log formats
   - Direct integration with Log4J2 GELF appender
+  - Configurable log format mapping in a JSON file
 
 - **Technical Debt**:
-  - Fix timestamp handling for historical log entries
   - Improve naming conventions for formatters based on log sources
   - Enhance error handling and reporting
   - Additional unit tests
+  - provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
 
 ## Author
 

@@ -44,10 +44,12 @@ class DefaultGelfFormatterTest {
         // Then
         assertNotNull(result, "GELF message should not be null");
         
-        // Verify standard fields
+        // Verify GELF standard fields
+        assertEquals("1.1", result.getVersion(), "Version should be set to 1.2");
         assertEquals("192.168.87.52", result.getHost(), "Host should be set to client IP");
         assertEquals("Request from 192.168.87.52 -> 172.16.153.30: /search (403)", result.getShortMessage(), "Short message should be formatted correctly");
         assertEquals("Request from desktop from 192.168.87.52:122 -> 172.16.153.30: /search (403)", result.getFullMessage(), "Full message should be formatted correctly");
+        assertEquals(1576929197, result.getTimestamp(), "Timestamp should be int, long or double");
         assertEquals(1, result.getLevel(), "Level should be set to 1");
 
         // Verify additional fields
