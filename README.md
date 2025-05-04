@@ -28,7 +28,8 @@ A command-line tool that parses log messages from files and forwards them to a G
 Log2Graylog is a command-line utility for parsing log files in JSON format (other formats may be supported in future) and sending the content to a Graylog server.
 The app converts the log messages into the Graylog Extended Log Format (GELF) format and pushes them to the GELF HTTP input endpoint of the Graylog server.
 
-![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)
+![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)  
+*Screenshot of Graylog after importing log messages using Log2Graylog*
 
 ## Features
 
