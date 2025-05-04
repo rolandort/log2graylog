@@ -20,7 +20,7 @@
     -->
     <!-- source. https://github.com/apache/logging-log4j2/discussions/2495  -->
     <Socket name="GelfAppender" host="localhost" port="12201" protocol="udp">
-      <JsonTemplateLayout eventTemplateUri="classpath:CustomGelfLayout.json"
+      <JsonTemplateLayout eventTemplateUri="classpath:GelfLayout.json"
                           nullEventDelimiterEnabled="true"
                           locationInfoEnabled="true">
         <EventTemplateAdditionalField key="_facility" value="log2graylog" />
