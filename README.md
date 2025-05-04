@@ -25,7 +25,8 @@ A command-line tool that parses log messages from files and forwards them to a G
 
 ## Overview
 
-Log2Graylog is a command-line utility for parsing log files and sending their contents to a Graylog server in GELF format. 
+Log2Graylog is a command-line utility for parsing log files in JSON format (other formats may be supported in future) and sending the content to a Graylog server.
+The app converts the log messages into the Graylog Extended Log Format (GELF) format and pushes them to the GELF HTTP input endpoint of the Graylog server.
 
 ![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)
 
@@ -65,7 +66,7 @@ This will create an executable JAR file in the `target` directory.
 ### Command Line Options
 
 ```
-Usage: Log2Graylog [-hvV] [-t=<timeout>] [-u=<graylogUrl>] LOG_FILE
+Usage: log2graylog [-hvV] [-t=<timeout>] [-u=<graylogUrl>] LOG_FILE
 Parses log messages and sends them to Graylog using the GELF format.
       LOG_FILE              Logfile to parse as input
   -h, --help                Show this help message and exit.
@@ -146,9 +147,9 @@ mvn test
 ## Possible Improvements
 
 - **Feature Additions**:
-  - Support for additional log formats
-  - Direct integration with Log4J2 GELF appender
+  - Support for additional log formats with option to select the format
   - Configurable log format mapping in a JSON file
+  - Accept multiple logfiles as input
   - Dry-run option
 
 - **Performance Enhancements**:
@@ -161,6 +162,7 @@ mvn test
   - Additional unit tests
   - provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
   - Log file rotation config in log4j2.xml
+  - Direct integration with Log4J2 GELF appender
 
 ## Author
 
