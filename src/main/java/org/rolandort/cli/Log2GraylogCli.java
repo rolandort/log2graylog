@@ -81,9 +81,7 @@ public class Log2GraylogCli implements Callable<Integer> {
     } catch (Exception e) {
       logger.error("Error processing log file", e);
       System.err.println("Error processing lof file: " + e.getMessage());
-      if (verbose) {
-        e.printStackTrace();
-      }
+      if (verbose) e.printStackTrace();
       return 1;
     }
   }

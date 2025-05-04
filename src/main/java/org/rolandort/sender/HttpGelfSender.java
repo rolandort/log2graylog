@@ -31,7 +31,7 @@ public class HttpGelfSender implements GelfSender {
 
   /**
    * Sends a GELF message to a Graylog server over HTTP.
-   *
+   * <p>
    * The message is sent as a POST request to the Graylog server specified in the
    * constructor. The message is sent in the body of the request as a JSON string.
    * The method returns true if the message was successfully sent, false otherwise.
