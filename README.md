@@ -19,20 +19,20 @@ A command-line tool that parses log messages from files and forwards them to a G
 - [Development](#development)
   - [Project Structure](#project-structure)
   - [Testing](#testing)
-- [Roadmap](#roadmap)
+- [Possible Improvements](#possible-improvements)
 - [Author](#author)
 - [License](#license)
 
 ## Overview
 
-Log2Graylog is a utility for parsing log files and sending their contents to a Graylog server in GELF format. 
+Log2Graylog is a command-line utility for parsing log files and sending their contents to a Graylog server in GELF format. 
 
 ![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)
 
 ## Features
-- 
+
 - Command-line tool with options for specifying the Graylog server URL
-- Parse log messages from files with specific formats (e.g., JSON)
+- Parse log messages from files with specific formats (JSON)
 - Extract and map fields from log messages to GELF format
 - Add additional metadata to log entries
 - Send GELF messages to a Graylog server over HTTP
@@ -49,7 +49,7 @@ Log2Graylog is a utility for parsing log files and sending their contents to a G
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/log2graylog.git
+   git clone https://github.com/rolandort/log2graylog.git
    cd log2graylog
    ```
 
@@ -87,11 +87,6 @@ Specify a custom Graylog URL:
 java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt --out http://graylog-server:12202/gelf
 ```
 
-Enable verbose output:
-```bash
-java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt -v
-```
-
 ## Architecture
 
 Log2Graylog uses a modular architecture with the following components:
@@ -127,8 +122,6 @@ mvn test
 ```
 
 ## Possible Improvements
-
-Planned improvements:
 
 - **Performance Enhancements**:
   - Support for large log files (10+ GB) through chunking and parallel processing

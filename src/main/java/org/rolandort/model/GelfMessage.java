@@ -1,18 +1,20 @@
 package org.rolandort.model;
-import java.util.Map;
-import com.google.gson.Gson;
+
 import com.google.gson.JsonObject;
 import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class GelfMessage {
   String version = "1.1"; // fixed version
-  String host;
+  String host;            // required(?)
   String shortMessage;
   String fullMessage;
-  double timestamp; // epoc sec
-  int level;
-  Map<String, Object> additionalFields;
+  Double timestamp;       // epoc sec
+  Integer level = 1;      // default log level is 1
+  Map<String, Object> additionalFields = new HashMap<>();
 
   /**
    * @return a JSON string representation of the GelfMessage. The format is as

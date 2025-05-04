@@ -37,24 +37,19 @@ class DefaultGelfFormatterTest {
     }
 
     @Test
-    void formatMessage_ShouldCreateValidGelfMessage() {
+    void formatValidMessageTest() {
         // When
-        GelfMessage result = formatter.formatMessage(logMessage);
+        final GelfMessage result = formatter.formatMessage(logMessage);
 
         // Then
         assertNotNull(result, "GELF message should not be null");
         
         // Verify standard fields
         assertEquals("192.168.87.52", result.getHost(), "Host should be set to client IP");
-        assertEquals("Request: /search", result.getShortMessage(), "Short message should be formatted correctly");
-        assertEquals("desktop requests /search", result.getFullMessage(), "Full message should be formatted correctly");
+        assertEquals("Request from 192.168.87.52 -> 172.16.153.30: /search (403)", result.getShortMessage(), "Short message should be formatted correctly");
+        assertEquals("Request from desktop from 192.168.87.52:122 -> 172.16.153.30: /search (403)", result.getFullMessage(), "Full message should be formatted correctly");
         assertEquals(1, result.getLevel(), "Level should be set to 1");
-        
-        // Verify timestamp is recent (within last minute)
-        double currentTime = System.currentTimeMillis() / 1000.0;
-        assertTrue(result.getTimestamp() > currentTime - 60, "Timestamp should be recent");
-        assertTrue(result.getTimestamp() <= currentTime, "Timestamp should not be in the future");
-        
+
         // Verify additional fields
         Map<String, Object> additionalFields = result.getAdditionalFields();
         assertNotNull(additionalFields, "Additional fields should not be null");
@@ -69,19 +64,19 @@ class DefaultGelfFormatterTest {
     }
 
     @Test
-    void formatMessage_WithNullValues_ShouldHandleGracefully() {
+    void formatEmptyMessageTest() {
         // Given
         LogMessage emptyMessage = new LogMessage();
         // Leave all fields as null
         
         // When
-        GelfMessage result = formatter.formatMessage(emptyMessage);
+        final GelfMessage result = formatter.formatMessage(emptyMessage);
         
         // Then
         assertNotNull(result, "GELF message should not be null even with empty input");
         assertNull(result.getHost(), "Host should be null");
-        assertEquals("Request: null", result.getShortMessage(), "Short message should handle null URI");
-        assertEquals("null requests null", result.getFullMessage(), "Full message should handle null values");
+        assertEquals("Request from null -> null: null (null)", result.getShortMessage(), "Short message should handle null");
+        assertEquals("Request from null from null:null -> null: null (null)", result.getFullMessage(), "Full message should handle null");
         assertEquals(1, result.getLevel(), "Level should still be set to 1");
         
         // Verify additional fields contain null values

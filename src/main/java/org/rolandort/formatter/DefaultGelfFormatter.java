@@ -7,9 +7,8 @@ import org.rolandort.model.GelfMessage;
 import org.rolandort.model.LogMessage;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Singleton
 public class DefaultGelfFormatter implements GelfFormatter {
@@ -21,26 +20,31 @@ public class DefaultGelfFormatter implements GelfFormatter {
     logger.info("Formatting log message: {}", logMessage);
 
     final GelfMessage gelfMessage = new GelfMessage();
-    gelfMessage.setHost(logMessage.getClientIp()); // source
-    gelfMessage.setShortMessage("Request: " + logMessage.getClientRequestUri());
-    gelfMessage.setFullMessage(logMessage.getClientDeviceType() + " requests " + logMessage.getClientRequestUri());
-    gelfMessage.setTimestamp((double) System.currentTimeMillis() / 1000); // TODO: use current timestamp of import for testing purposes
-    // gelfMessage.setTimestamp(logMessage.getEdgeStartTimestamp()); // using original log timetamp (will not be visible in Graylog)
-    gelfMessage.setLevel(1); // TODO: possibly map log level
+    gelfMessage.setHost(logMessage.getClientIp());
 
-    // Collect all fields from LogMessage
-    Map<String, Object> additionalFields = Arrays.stream(logMessage.getClass().getDeclaredFields())
-        .peek(field -> field.setAccessible(true))
-        .collect(Collectors.toMap(
-            Field::getName,
-            field -> {
-              try {
-                return field.get(logMessage);
-              } catch (IllegalAccessException e) {
-                return "ERROR: Cannot access";
-              }
-            }
-        ));
+    final String short_message = "Request from " + logMessage.getClientIp() + " -> " + logMessage.getDestinationIp() + ": " + logMessage.getClientRequestUri() + " (" + logMessage.getClientStatus() + ")";
+    gelfMessage.setShortMessage(short_message);
+
+    final String full_message = "Request from " + logMessage.getClientDeviceType() + " from " + logMessage.getClientIp() + ":" + logMessage.getClientSrcPort() + " -> " + logMessage.getDestinationIp() + ": " + logMessage.getClientRequestUri() + " (" + logMessage.getClientStatus() + ")";
+    gelfMessage.setFullMessage(full_message);
+
+    gelfMessage.setTimestamp(logMessage.getEdgeStartTimestamp()); // using original log timestamp
+    gelfMessage.setLevel(1);
+
+    // Collect all fields from LogMessage with null safety
+    final Map<String, Object> additionalFields = new HashMap<>();
+
+    // Using for loop to handle null values (not working using steam)
+    for (Field field : logMessage.getClass().getDeclaredFields()) {
+      field.setAccessible(true);
+      try {
+        final String fieldName = field.getName();
+        final Object fieldValue = field.get(logMessage);
+        additionalFields.put(fieldName, fieldValue);
+      } catch (IllegalAccessException e) {
+        logger.warn("Error accessing null value in field: " + field.getName(), e);
+      }
+    }
 
     gelfMessage.setAdditionalFields(additionalFields);
     return gelfMessage;
