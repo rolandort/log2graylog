@@ -1,12 +1,12 @@
 package org.rolandort.cli;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rolandort.di.AppInjector;
 import org.rolandort.service.LogProcessingService;
 import picocli.CommandLine;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -24,17 +24,24 @@ public class Log2GraylogCli implements Callable<Integer> {
 
   @CommandLine.Parameters(
       index = "0",
-      description = "The log file to parse",
+      description = "Logfile to parse as input",
       paramLabel = "LOG_FILE"
   )
   private File logFile;
 
   @CommandLine.Option(
-      names = {"-o", "--out"},
-      description = "The output URL of the Graylog GELF HTTP interface",
+      names = {"-u", "--url"},
+      description = "Output URL of the Graylog GELF HTTP interface (default: ${DEFAULT-VALUE})",
       defaultValue = "http://localhost:12202/gelf"
   )
-  private String graylogUrl = "http://localhost:12202/gelf"; // Default value
+  private String graylogUrl;
+
+  @CommandLine.Option(
+      names = {"-t", "--timeout"},
+      description = "Timeout of HTTP requests in seconds. (default: ${DEFAULT-VALUE} sec)",
+      defaultValue = "10"
+  )
+  private int timeout;
 
   @CommandLine.Option(
       names = {"-v", "--verbose"},
@@ -44,11 +51,12 @@ public class Log2GraylogCli implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    logger.info("Started Log2Graylog CLI");
+    logger.info("Started Log2Graylog CLI version {}", Log2GraylogCli.class.getPackage().getImplementationVersion());
 
     if (verbose) {
       System.out.println("Logfile: " + logFile.getAbsolutePath());
       System.out.println("Graylog URL: " + graylogUrl);
+      System.out.println("Timeout: " + timeout + " seconds");
     }
 
     // Validate log file
@@ -59,8 +67,8 @@ public class Log2GraylogCli implements Callable<Integer> {
 
     try {
       // Set up dependency injection with injector class implementation object
-      Injector injector = Guice.createInjector(new AppInjector(graylogUrl));
-      LogProcessingService logProcessingService = injector.getInstance(LogProcessingService.class);
+      final Injector injector = Guice.createInjector(new AppInjector(graylogUrl, timeout));
+      final LogProcessingService logProcessingService = injector.getInstance(LogProcessingService.class);
 
       // Process the log file
       final Path logFilePath = logFile.toPath();

@@ -19,11 +19,13 @@ public class HttpGelfSender implements GelfSender {
   private static final Logger logger = LogManager.getLogger(HttpGelfSender.class);
 
   private final String graylogUrl;
+  private final int timeout;
   private final HttpClient client;
 
   @Inject
-  public HttpGelfSender(String graylogUrl) {
+  public HttpGelfSender(String graylogUrl, int timeout) {
     this.graylogUrl = graylogUrl;
+    this.timeout = timeout;
     this.client = HttpClient.newHttpClient();
   }
 
@@ -39,14 +41,14 @@ public class HttpGelfSender implements GelfSender {
    */
   @Override
   public boolean sendMessage(final GelfMessage gelfMessage) {
-    logger.info("Sending GELF message to {}: {}", graylogUrl, gelfMessage.toString());
+    logger.info("Sending GELF message to {} (timeout: {} sec): '{}'", graylogUrl, timeout, gelfMessage.toString());
 
     // HTTP request using internal HttpClient of Java 17
     final HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create(this.graylogUrl))
         .header("Content-Type", "application/json")
         .POST(HttpRequest.BodyPublishers.ofString(gelfMessage.toString()))
-        .timeout(java.time.Duration.ofSeconds(10)) // TODO: a short timeout for testing
+        .timeout(java.time.Duration.ofSeconds(timeout)) // TODO: a short timeout for testing
         .build();
 
     final HttpResponse<String> response;
@@ -54,15 +56,15 @@ public class HttpGelfSender implements GelfSender {
       // Send the HTTP request
       response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() < 200 ||response.statusCode() >= 300) {
-        logger.error("Error {} sending GELF message to Graylog: {}", response.statusCode(), gelfMessage);
+        logger.error("Error {} sending GELF message to {}: '{}'", graylogUrl, response.statusCode(), gelfMessage);
         return false;
       }
     } catch (IOException | InterruptedException e) {
-      logger.error("Exception sending GELF message to Graylog: {}", gelfMessage, e);
+      logger.error("Exception sending GELF message to {}: '{}'", graylogUrl, gelfMessage, e);
       return false;
     }
 
-    logger.info("Successfully sent message to {}: {}", graylogUrl, gelfMessage);
+    logger.info("Successfully sent GELF message to {}: '{}'", graylogUrl, gelfMessage);
     return true;
   }
 

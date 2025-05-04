@@ -41,7 +41,7 @@ public class LogProcessingService {
 
     // Parse log messages from file
     final List<LogMessage> logMessages = logParser.parseLogFile(filePath);
-    logger.info("Found {} log messages in file {}", logMessages.size(), filePath);
+    logger.info("Found {} log messages in input file {}", logMessages.size(), filePath);
 
     if (logMessages.isEmpty()) {
       logger.warn("No log messages found in file {}", filePath);
@@ -54,7 +54,7 @@ public class LogProcessingService {
       GelfMessage gelfMessage = gelfFormatter.formatMessage(logMessage);
       gelfMessages.add(gelfMessage);
     }
-    logger.info("Converted {} of {} log messages to GELF format", gelfMessages.size(), logMessages.size());
+    logger.info("Converted {} of {} log messages into GELF format", gelfMessages.size(), logMessages.size());
 
     // Send GELF messages to Graylog server
     int sentCount = gelfSender.sendMessages(gelfMessages);

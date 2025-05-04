@@ -43,7 +43,7 @@ Log2Graylog is a command-line utility for parsing log files and sending their co
 
 - Java 17 or higher
 - Maven 3.6 or higher
-- A running Graylog server with a GELF HTTP input configured
+- A running Graylog server with a GELF HTTP input configured (see https://github.com/Graylog2/graylog-project)
 
 ### Building from Source
 
@@ -65,14 +65,15 @@ This will create an executable JAR file in the `target` directory.
 ### Command Line Options
 
 ```
-Usage: Log2Graylog [-hVv] [-o=<graylogUrl>] LOG_FILE
+Usage: Log2Graylog [-hvV] [-t=<timeout>] [-u=<graylogUrl>] LOG_FILE
 Parses log messages and sends them to Graylog using the GELF format.
-      LOG_FILE                 The log file to parse
-  -h, --help                   Show this help message and exit.
-  -o, --out=<graylogUrl>       The output URL of the Graylog GELF HTTP interface
-                               Default: http://localhost:12202/gelf
-  -v, --verbose                Enable verbose output
-  -V, --version                Print version information and exit.
+      LOG_FILE              Logfile to parse as input
+  -h, --help                Show this help message and exit.
+  -t, --timeout=<timeout>   Timeout of HTTP requests in seconds. (default: 10 sec)
+  -u, --url=<graylogUrl>    Output URL of the Graylog GELF HTTP interface
+                              (default: http://localhost:12202/gelf)
+  -v, --verbose             Enable verbose output
+  -V, --version             Print version information and exit.
 ```
 
 ### Examples
@@ -84,7 +85,7 @@ java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt
 
 Specify a custom Graylog URL:
 ```bash
-java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt --out http://graylog-server:12202/gelf
+java -jar target/log2graylog-1.0-SNAPSHOT.jar -v --timeout 30 --url http://graylog-server:12202/gelf sample-messages.txt
 ```
 
 Example source log message:
@@ -107,7 +108,6 @@ Example source log message:
   "OriginResponseTime": 398000000
 }
 ```
-
 
 ## Architecture
 
@@ -145,21 +145,22 @@ mvn test
 
 ## Possible Improvements
 
-- **Performance Enhancements**:
-  - Support for large log files (10+ GB) through chunking and parallel processing
-  - Asynchronous HTTP requests using CompletableFuture or PushPromiseHandler
-
 - **Feature Additions**:
-  - Configurable HTTP timeouts (currently fixed at 10 seconds)
   - Support for additional log formats
   - Direct integration with Log4J2 GELF appender
   - Configurable log format mapping in a JSON file
+  - Dry-run option
+
+- **Performance Enhancements**:
+  - Support for large log files (10+ GB) through chunking and parallel processing
+  - Performance optimizations using asynchronous HTTP requests (using CompletableFuture or PushPromiseHandler)
 
 - **Technical Debt**:
   - Improve naming conventions for formatters based on log sources
   - Enhance error handling and reporting
   - Additional unit tests
   - provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
+  - Log file rotation config in log4j2.xml
 
 ## Author
 

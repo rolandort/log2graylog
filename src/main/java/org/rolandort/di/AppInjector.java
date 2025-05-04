@@ -16,9 +16,11 @@ import org.rolandort.sender.HttpGelfSender;
 public class AppInjector extends AbstractModule {
 
   private final String graylogUrl;
+  private final int timeout;
 
-  public AppInjector(String graylogUrl) {
+  public AppInjector(String graylogUrl, int timeout) {
     this.graylogUrl = graylogUrl;
+    this.timeout = timeout;
   }
 
   // Simple bindings for LogParser and GelfFormatter
@@ -33,6 +35,6 @@ public class AppInjector extends AbstractModule {
   @Provides
   @Singleton
   public GelfSender provideGelfSender() {
-    return new HttpGelfSender(graylogUrl);
+    return new HttpGelfSender(graylogUrl, timeout);
   }
 }
