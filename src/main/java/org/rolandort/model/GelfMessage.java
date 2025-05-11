@@ -8,17 +8,16 @@ import java.util.Map;
 
 @Data
 public class GelfMessage {
-  String version = "1.1"; // fixed version
-  String host;            // required(?)
-  String shortMessage;
-  String fullMessage;
+  String version = "1.1"; // fixed gelf version
+  String host;            // required
+  String shortMessage;    // short string
+  String fullMessage;     // long string
   Double timestamp;       // epoc sec
   Integer level = 1;      // default log level is 1
   Map<String, Object> additionalFields = new HashMap<>();
 
   /**
-   * @return a JSON string representation of the GelfMessage. The format is as
-   *     follows:
+   * @return a JSON string representation of the GelfMessage with format:
    *     <pre>
    *     {
    *       "version": "1.1",
@@ -34,7 +33,7 @@ public class GelfMessage {
    */
   @Override
   public String toString() {
-    JsonObject jsonObject = new JsonObject();
+    final JsonObject jsonObject = new JsonObject();
     
     // Add standard fields
     jsonObject.addProperty("version", version);
@@ -47,7 +46,7 @@ public class GelfMessage {
     // Add additional fields with "_" prefix
     if (additionalFields != null) {
       for (Map.Entry<String, Object> entry : additionalFields.entrySet()) {
-        String key = "_" + entry.getKey();
+        String key = "_" + entry.getKey(); // required prefix "_"
         Object value = entry.getValue();
         
         if (value instanceof Number) {

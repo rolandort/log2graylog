@@ -38,10 +38,8 @@ class DefaultGelfFormatterTest {
 
     @Test
     void formatValidMessageTest() {
-        // When
         final GelfMessage result = formatter.formatMessage(logMessage);
 
-        // Then
         assertNotNull(result, "GELF message should not be null");
         
         // Verify GELF standard fields
@@ -67,11 +65,8 @@ class DefaultGelfFormatterTest {
 
     @Test
     void formatEmptyMessageTest() {
-        // Given
-        LogMessage emptyMessage = new LogMessage();
         // Leave all fields as null
-        
-        // When
+        final LogMessage emptyMessage = new LogMessage();
         final GelfMessage result = formatter.formatMessage(emptyMessage);
         
         // Then

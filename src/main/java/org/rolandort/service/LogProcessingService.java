@@ -24,7 +24,7 @@ public class LogProcessingService {
 
   // Constructor-based injector
   @Inject
-  public LogProcessingService(LogParser logParser, GelfFormatter gelfFormatter, GelfSender gelfSender) {
+  public LogProcessingService(final LogParser logParser, final GelfFormatter gelfFormatter, final GelfSender gelfSender) {
     this.logParser = logParser;
     this.gelfFormatter = gelfFormatter;
     this.gelfSender = gelfSender;
@@ -37,27 +37,27 @@ public class LogProcessingService {
    * @param filePath The path to the log file to process.
    * @return The number of log messages that were successfully sent to Graylog.
    */
-  public int processLogFile(Path filePath) {
+  public int processLogFile(final Path filePath) {
 
     // Parse log messages from file
     final List<LogMessage> logMessages = logParser.parseLogFile(filePath);
-    logger.info("Found {} log messages in input file {}", logMessages.size(), filePath);
-
     if (logMessages.isEmpty()) {
       logger.warn("No log messages found in file {}", filePath);
       return 0;
+    } else {
+      logger.info("Found {} log messages in input file {}", logMessages.size(), filePath);
     }
 
     // Convert a log message into GELF format and send to Graylog
     final List<GelfMessage> gelfMessages = new ArrayList<>();
-    for (LogMessage logMessage : logMessages) {
+    for (final LogMessage logMessage : logMessages) {
       GelfMessage gelfMessage = gelfFormatter.formatMessage(logMessage);
       gelfMessages.add(gelfMessage);
     }
     logger.info("Converted {} of {} log messages into GELF format", gelfMessages.size(), logMessages.size());
 
     // Send GELF messages to Graylog server
-    int sentCount = gelfSender.sendMessages(gelfMessages);
+    final int sentCount = gelfSender.sendMessages(gelfMessages);
     logger.info("Successfully sent {} of {} messages to Graylog", sentCount, logMessages.size());
     return sentCount;
   }

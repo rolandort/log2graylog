@@ -1,5 +1,7 @@
 package org.rolandort.parser;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,9 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,18 +18,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Default implementation (Cloudflare?/JSON) of the LogParser interface.
+ * JSON log parser implementation.
  */
-
 @Singleton
-public class DefaultLogParser implements LogParser {
-  private static final Logger logger = LogManager.getLogger(DefaultLogParser.class);
+public class JsonLogParser implements LogParser {
+  private static final Logger logger = LogManager.getLogger(JsonLogParser.class);
   private final Gson gson;
   
-  public DefaultLogParser() {
+  public JsonLogParser() {
     // Create a Gson instance with custom settings
     this.gson = new GsonBuilder()
-        .setLenient() // Be lenient with malformed JSON
+        .setLenient() // accept malformed JSON
         .create();
   }
 
@@ -41,8 +39,8 @@ public class DefaultLogParser implements LogParser {
    * @return A list of log messages parsed from the file.
    */
   @Override
-  public List<LogMessage> parseLogFile(Path filePath) {
-    logger.info("Parsing log file {}", filePath);
+  public List<LogMessage> parseLogFile(final Path filePath) {
+    logger.info("Parsing JSON log file {}", filePath);
     List<LogMessage> logMessages = new ArrayList<>();
 
     try (Stream<String> lines = Files.lines(Paths.get(filePath.toString()))) {
@@ -52,7 +50,7 @@ public class DefaultLogParser implements LogParser {
           .filter(Objects::nonNull) // ignore empty rows
           .collect(Collectors.toList());
     } catch (IOException e) {
-      logger.error("Error parsing log file {}", filePath, e);
+      logger.error("Error parsing JSON log file {}", filePath, e);
     }
     return logMessages;
   }
@@ -64,7 +62,7 @@ public class DefaultLogParser implements LogParser {
    * @return The log message parsed from the log line as JSON, or null if the line was empty or invalid.
    */
   @Override
-  public LogMessage parseLine(String logLine) {
+  public LogMessage parseLine(final String logLine) {
 
     if (logLine == null || logLine.isEmpty()) {
       logger.warn("Empty log line");

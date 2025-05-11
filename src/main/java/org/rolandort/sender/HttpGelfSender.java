@@ -32,8 +32,7 @@ public class HttpGelfSender implements GelfSender {
   /**
    * Sends a GELF message to a Graylog server over HTTP.
    * <p>
-   * The message is sent as a POST request to the Graylog server specified in the
-   * constructor. The message is sent in the body of the request as a JSON string.
+   * The message is sent as a POST request to the Graylog server.
    * The method returns true if the message was successfully sent, false otherwise.
    *
    * @param gelfMessage The GELF message to send
@@ -43,24 +42,23 @@ public class HttpGelfSender implements GelfSender {
   public boolean sendMessage(final GelfMessage gelfMessage) {
     logger.info("Sending GELF message to {} (timeout: {} sec): '{}'", graylogUrl, timeout, gelfMessage.toString());
 
-    // HTTP request using internal HttpClient of Java 17
+    // HTTP request using internal HttpClient of Java >=17
     final HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create(this.graylogUrl))
         .header("Content-Type", "application/json")
         .POST(HttpRequest.BodyPublishers.ofString(gelfMessage.toString()))
-        .timeout(java.time.Duration.ofSeconds(timeout)) // TODO: a short timeout for testing
+        .timeout(java.time.Duration.ofSeconds(timeout))
         .build();
 
-    final HttpResponse<String> response;
     try {
       // Send the HTTP request
-      response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() < 200 ||response.statusCode() >= 300) {
         logger.error("Error {} sending GELF message to {}: '{}'", graylogUrl, response.statusCode(), gelfMessage);
         return false;
       }
     } catch (IOException | InterruptedException e) {
-      logger.error("Exception sending GELF message to {}: '{}'", graylogUrl, gelfMessage, e);
+      logger.error("Exception ({}) sending GELF message to {}: '{}'", e.getCause(), graylogUrl, gelfMessage, e);
       return false;
     }
 
@@ -70,8 +68,6 @@ public class HttpGelfSender implements GelfSender {
 
   /**
    * Send a list of GELF messages to the Graylog server over HTTP.
-   * The method sends each message individually, and returns the number of messages that were
-   * successfully sent.
    *
    * @param gelfMessages The list of GELF messages to send
    * @return The number of messages that were sent successfully

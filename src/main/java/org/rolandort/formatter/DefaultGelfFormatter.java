@@ -10,14 +10,20 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @Singleton
 public class DefaultGelfFormatter implements GelfFormatter {
   private static final Logger logger = LogManager.getLogger(DefaultGelfFormatter.class);
 
-
+  /**
+   * Formats a {@link LogMessage} into a {@link GelfMessage}.
+   *
+   * @param logMessage the log message to be formatted
+   * @return the formatted GELF message
+   */
   @Override
-  public GelfMessage formatMessage(LogMessage logMessage) {
-    logger.info("Formatting log message: {}", logMessage);
+  public GelfMessage formatMessage(final LogMessage logMessage) {
+    logger.info("Formatting GELF message: {}", logMessage);
 
     final GelfMessage gelfMessage = new GelfMessage();
     gelfMessage.setHost(logMessage.getClientIp());
@@ -28,10 +34,10 @@ public class DefaultGelfFormatter implements GelfFormatter {
     final String full_message = "Request from " + logMessage.getClientDeviceType() + " from " + logMessage.getClientIp() + ":" + logMessage.getClientSrcPort() + " -> " + logMessage.getDestinationIp() + ": " + logMessage.getClientRequestUri() + " (" + logMessage.getClientStatus() + ")";
     gelfMessage.setFullMessage(full_message);
 
-    gelfMessage.setTimestamp(logMessage.getEdgeStartTimestamp()); // using original log timestamp
-    gelfMessage.setLevel(1);
+    gelfMessage.setTimestamp(logMessage.getEdgeStartTimestamp());
+    gelfMessage.setLevel(1); // ToDo: set dynamic log level based on log message
 
-    // Collect all fields from LogMessage with null safety
+    // Collect all fields from LogMessage with null safety as additional fields
     final Map<String, Object> additionalFields = new HashMap<>();
 
     // Using for loop to handle null values (not working using steam)

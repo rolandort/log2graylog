@@ -67,11 +67,15 @@ This will create an executable JAR file in the `target` directory.
 ### Command Line Options
 
 ```
-Usage: log2graylog [-hvV] [-t=<timeout>] [-u=<graylogUrl>] LOG_FILE
-Parses log messages and sends them to Graylog using the GELF format.
+Usage: Log2Graylog [-hvV] [-p=<parserType>] [-s=<senderType>] [-t=<timeout>]
+                   [-u=<graylogUrl>] LOG_FILE
+Parses log messages and send them to Graylog using the GELF format.
       LOG_FILE              Logfile to parse as input
   -h, --help                Show this help message and exit.
-  -t, --timeout=<timeout>   Timeout of HTTP requests in seconds. (default: 10 sec)
+  -p, --parser=<parserType> Parser type (JSON|CSV, default: JSON)
+  -s, --sender=<senderType> Sender type (SIMULATE|HTTP, default: HTTP)
+  -t, --timeout=<timeout>   Timeout of HTTP requests in seconds. (default: 10
+                              sec)
   -u, --url=<graylogUrl>    Output URL of the Graylog GELF HTTP interface
                               (default: http://localhost:12202/gelf)
   -v, --verbose             Enable verbose output
@@ -80,17 +84,22 @@ Parses log messages and sends them to Graylog using the GELF format.
 
 ### Examples
 
-Basic usage with default Graylog URL (http://localhost:12202/gelf):
+Basic usage with JSON log file, HTTP sender and default Graylog URL (http://localhost:12202/gelf):
 ```bash
-java -jar target/log2graylog-1.0-SNAPSHOT.jar sample-messages.txt
+java -jar target/log2graylog-1.1-SNAPSHOT.jar sample-messages.txt
 ```
 
-Specify a custom Graylog URL:
+Custom Graylog URL and timeout
 ```bash
-java -jar target/log2graylog-1.0-SNAPSHOT.jar -v --timeout 30 --url http://graylog-server:12202/gelf sample-messages.txt
+java -jar target/log2graylog-1.1-SNAPSHOT.jar -v --timeout 30 --url http://graylog-server:12202/gelf sample-messages.txt
 ```
 
-Example source log message:
+CSV log file and simulated sender
+```bash
+java -jar target/log2graylog-1.1-SNAPSHOT.jar -p CSV -s SIMULATE sample-messages.csv
+```
+
+Example source JSON log message:
 
 ```json
 {
@@ -110,6 +119,12 @@ Example source log message:
   "OriginResponseTime": 398000000
 }
 ```
+Example source CSV log message:
+
+```csv
+ClientDeviceType,ClientIP,ClientIPClass,ClientStatus,ClientRequestBytes,ClientRequestReferer,ClientRequestURI,ClientRequestUserAgent,ClientSrcPort,EdgeServerIP,EdgeStartTimestamp,DestinationIP,OriginResponseBytes,OriginResponseTime
+desktop,192.168.237.181,noRecord,200,927,torch.sh,/search,"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15",564,10.0.56.97,1576929197,172.16.101.17,571,296000000
+```
 
 ## Architecture
 
@@ -119,6 +134,9 @@ Log2Graylog uses a modular architecture with the following components:
 2. **Log Parser** - Reads and parses log files into structured data
 3. **GELF Formatter** - Converts parsed log entries to GELF format
 4. **HTTP Sender** - Sends GELF messages to the Graylog server
+5. **PicoCli** - Command-line interface library for Java
+6. **Guice** - Dependency injection framework
+7. **Opencsv** - CSV parsing library 
 
 The application uses dependency injection (Guice) to manage component dependencies and configuration.
 
@@ -148,17 +166,17 @@ mvn test
 ## Possible Improvements
 
 - **Feature Additions**:
-  - Support for additional log formats with option to select the format
+  - Support for additional log formats with option to select the format - DONE
   - Configurable log format mapping in a JSON file
   - Accept multiple logfiles as input
-  - Dry-run option
+  - Dry-run option - DONE (using --sender SIMULATE)
 
 - **Performance Enhancements**:
   - Support for large log files (10+ GB) through chunking and parallel processing
   - Performance optimizations using asynchronous HTTP requests (using CompletableFuture or PushPromiseHandler)
 
 - **Technical Debt**:
-  - Improve naming conventions for formatters based on log sources
+  - Improve naming conventions for formatters based on log sources - DOEN
   - Enhance error handling and reporting
   - Additional unit tests
   - provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
