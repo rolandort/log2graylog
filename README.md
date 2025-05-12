@@ -25,7 +25,7 @@ A command-line tool that parses log messages from files and forwards them to a G
 
 ## Overview
 
-Log2Graylog is a command-line utility for parsing log files in JSON format (other formats may be supported in future) and sending the content to a Graylog server.
+Log2Graylog is a command-line utility for parsing log files in JSON or CSV format (other formats may be supported in future) and sending the content to a Graylog server.
 The app converts the log messages into the Graylog Extended Log Format (GELF) format and pushes them to the GELF HTTP input endpoint of the Graylog server.
 
 ![Graylog Screenshot showing log messages processed by Log2Graylog](docs/images/graylog-screenshot.png)  
@@ -33,11 +33,11 @@ The app converts the log messages into the Graylog Extended Log Format (GELF) fo
 
 ## Features
 
-- Command-line tool with options for specifying the Graylog server URL
-- Parse log messages from files with specific formats (JSON)
+- Parse log messages from files with specific formats (JSON, CSV)
 - Extract and map fields from log messages to GELF format
 - Add additional metadata to log entries
 - Send GELF messages to a Graylog server over HTTP
+- Options for specifying the Graylog server URL and timeout
 
 ## Installation
 
@@ -96,7 +96,7 @@ java -jar target/log2graylog-1.1-SNAPSHOT.jar -v --timeout 30 --url http://grayl
 
 CSV log file and simulated sender
 ```bash
-java -jar target/log2graylog-1.1-SNAPSHOT.jar -p CSV -s SIMULATE sample-messages.csv
+java -jar target/log2graylog-1.1-SNAPSHOT.jar --parser CSV --sender SIMULATE sample-messages.csv
 ```
 
 Example source JSON log message:
@@ -130,15 +130,20 @@ desktop,192.168.237.181,noRecord,200,927,torch.sh,/search,"Mozilla/5.0 (Macintos
 
 Log2Graylog uses a modular architecture with the following components:
 
-1. **CLI Interface** - Handles command-line arguments and user interaction
+1. **CLI** - Command-line interface library for Java
 2. **Log Parser** - Reads and parses log files into structured data
 3. **GELF Formatter** - Converts parsed log entries to GELF format
 4. **HTTP Sender** - Sends GELF messages to the Graylog server
-5. **PicoCli** - Command-line interface library for Java
-6. **Guice** - Dependency injection framework
-7. **Opencsv** - CSV parsing library 
 
-The application uses dependency injection (Guice) to manage component dependencies and configuration.
+### Dependencies
+
+- PicoCli - Command-line interface library for Java
+- Google Guice - Dependency injection framework
+- Gson - JSON parsing library
+- Opencsv - CSV parsing library
+- Log4j - Logging framework
+- Lombok - Code generation library
+- Junit - Unit testing framework
 
 ## Development
 
@@ -166,22 +171,22 @@ mvn test
 ## Possible Improvements
 
 - **Feature Additions**:
-  - Support for additional log formats with option to select the format - DONE
-  - Configurable log format mapping in a JSON file
-  - Accept multiple logfiles as input
-  - Dry-run option - DONE (using --sender SIMULATE)
+  - [x] Support for additional log formats with option to select the format
+  - [ ] Configurable log format mapping in a JSON file
+  - [ ] Accept multiple logfiles as input
+  - [x] Dry-run option - DONE (using --sender SIMULATE)
 
 - **Performance Enhancements**:
-  - Support for large log files (10+ GB) through chunking and parallel processing
-  - Performance optimizations using asynchronous HTTP requests (using CompletableFuture or PushPromiseHandler)
+  - [ ] Support for large log files (10+ GB) through chunking and parallel processing
+  - [ ] Performance optimizations using asynchronous HTTP requests (using CompletableFuture or PushPromiseHandler)
 
 - **Technical Debt**:
-  - Improve naming conventions for formatters based on log sources - DOEN
-  - Enhance error handling and reporting
-  - Additional unit tests
-  - provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
-  - Log file rotation config in log4j2.xml
-  - Direct integration with Log4J2 GELF appender
+  - [x] Improve naming conventions for formatters based on log sources
+  - [ ] Enhance error handling and reporting
+  - [ ] Additional unit tests
+  - [ ] provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
+  - [ ] Log file rotation config in log4j2.xml
+  - [ ] Direct integration with Log4J2 GELF appender
 
 ## Author
 
