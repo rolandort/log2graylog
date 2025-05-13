@@ -53,8 +53,11 @@ public class HttpGelfSender implements GelfSender {
     try {
       // Send the HTTP request
       final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      if (response.statusCode() < 200 ||response.statusCode() >= 300) {
-        logger.error("Error {} sending GELF message to {}: '{}'", graylogUrl, response.statusCode(), gelfMessage);
+      if (response.statusCode() >= 200 && response.statusCode() < 400) {
+        logger.info("Successfully sent GELF message to {} ({}): '{}'", graylogUrl, response.statusCode(), gelfMessage);
+        return true;
+      } else {
+        logger.error("Error sending GELF message to {} ({}): '{}'", graylogUrl, response.statusCode(), gelfMessage);
         return false;
       }
     } catch (IOException | InterruptedException e) {
@@ -62,8 +65,6 @@ public class HttpGelfSender implements GelfSender {
       return false;
     }
 
-    logger.info("Successfully sent GELF message to {}: '{}'", graylogUrl, gelfMessage);
-    return true;
   }
 
   /**

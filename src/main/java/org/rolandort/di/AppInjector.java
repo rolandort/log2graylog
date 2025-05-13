@@ -31,7 +31,7 @@ public class AppInjector extends AbstractModule {
     this.timeout = timeout;
   }
 
-  // Simple bindings for LogParser and GelfFormatter
+  // Simple bindings for GelfFormatter
   @Override
   protected void configure() {
     // Bind the service to implementation class

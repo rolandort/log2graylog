@@ -179,6 +179,7 @@ mvn test
 - **Performance Enhancements**:
   - [ ] Support for large log files (10+ GB) through chunking and parallel processing
   - [ ] Performance optimizations using asynchronous HTTP requests (using CompletableFuture or PushPromiseHandler)
+  - [ ] Batch processing to reduce the number of HTTP requests
 
 - **Technical Debt**:
   - [x] Improve naming conventions for formatters based on log sources
@@ -187,6 +188,10 @@ mvn test
   - [ ] provide stats on import e.g. throughput, error rate, max/min timestamp, ... 
   - [ ] Log file rotation config in log4j2.xml
   - [ ] Direct integration with Log4J2 GELF appender
+  - [ ] Optionals (isPresent) for additional fields missing fields
+  - [ ] Jackson vs. Gson (remove unneeded dependencies)
+  - [x] Accepts response code 30x (redirects)
+  - [ ] Replace Lombok
 
 ## Author
 

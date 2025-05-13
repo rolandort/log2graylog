@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * CSV log parser implementation
@@ -51,9 +52,9 @@ public class CsvLogParser implements LogParser {
       
       String[] line;
       while ((line = reader.readNext()) != null) {
-        final LogMessage message = createLogMessageFromCsvLine(line);
-        if (message != null) {
-          logMessages.add(message);
+        final Optional<LogMessage> message = createLogMessageFromCsvLine(line);
+        if (message.isPresent()) {
+          logMessages.add(message.get());
         }
       }
       
@@ -72,7 +73,7 @@ public class CsvLogParser implements LogParser {
    * @return The log message parsed from the log line, or null if the line was empty or invalid.
    */
   @Override
-  public LogMessage parseLine(final String logLine) {
+  public Optional<LogMessage> parseLine(final String logLine) {
     if (logLine == null || logLine.isEmpty()) {
       logger.warn("Empty log line");
       return null;
@@ -99,14 +100,14 @@ public class CsvLogParser implements LogParser {
    * @param line Array of CSV values
    * @return LogMessage object populated with values from the CSV line
    */
-  private LogMessage createLogMessageFromCsvLine(final String[] line) {
+  private Optional<LogMessage> createLogMessageFromCsvLine(final String[] line) {
     if (line == null || line.length < 10) {
       logger.warn("CSV line has insufficient columns: {}", line == null ? "null" : line.length);
       return null;
     }
     
     try {
-      LogMessage message = new LogMessage();
+      final LogMessage message = new LogMessage();
       // Map CSV columns to LogMessage fields
       int i = 0;
       message.setClientDeviceType(getSafeString(line, i++));
@@ -123,10 +124,10 @@ public class CsvLogParser implements LogParser {
       message.setDestinationIp(getSafeString(line, i++));
       message.setOriginResponseBytes(getSafeInteger(line, i++));
       message.setOriginResponseTime(getSafeInteger(line, i));
-      return message;
+      return Optional.of(message);
     } catch (Exception e) {
       logger.error("Error mapping CSV values to LogMessage: {}", e.getMessage());
-      return null;
+      return Optional.empty();
     }
   }
   

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,41 +41,40 @@ public class JsonLogParser implements LogParser {
   @Override
   public List<LogMessage> parseLogFile(final Path filePath) {
     logger.info("Parsing JSON log file {}", filePath);
-    List<LogMessage> logMessages = new ArrayList<>();
 
     try (Stream<String> lines = Files.lines(Paths.get(filePath.toString()))) {
-      // Process each line
-      logMessages = lines
-          .map(this::parseLine)
-          .filter(Objects::nonNull) // ignore empty rows
-          .collect(Collectors.toList());
+      // Process each line using stream operations with flatMap to handle Optionals
+      return lines
+          .map(this::parseLine)                // Parse each line to Optional<LogMessage>
+          .flatMap(Optional::stream)           // Convert Optional to Stream (empty or singleton)
+          .collect(Collectors.toList());       // Collect results to List
     } catch (IOException e) {
       logger.error("Error parsing JSON log file {}", filePath, e);
+      return new ArrayList<>();                // Return empty list on error
     }
-    return logMessages;
   }
 
   /**
-   * Parse a single log line and extract a log message as JSON.
+   * Parse a log line and extract a log message.
    *
    * @param logLine The log line to parse.
    * @return The log message parsed from the log line as JSON, or null if the line was empty or invalid.
    */
   @Override
-  public LogMessage parseLine(final String logLine) {
-
+  public Optional<LogMessage> parseLine(final String logLine) {
     if (logLine == null || logLine.isEmpty()) {
       logger.warn("Empty log line");
-      return null;
+      return Optional.empty();
     }
 
     try {
+      // Parse the log line as JSON using Gson
       final LogMessage logMessage = gson.fromJson(logLine, LogMessage.class);
       logger.debug("Parsed log message: {}", logMessage);
-      return logMessage;
+      return Optional.ofNullable(logMessage);
     } catch (Exception e) {
       logger.error("Error parsing log line: {}", logLine, e);
-      return null;
+      return Optional.empty();  // Return empty Optional instead of null
     }
   }
 }

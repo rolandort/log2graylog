@@ -4,9 +4,10 @@ import org.rolandort.model.LogMessage;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public interface LogParser {
   List<LogMessage> parseLogFile(Path filePath);
 
-  LogMessage parseLine(String logLine);
+  Optional<LogMessage> parseLine(String logLine);
 }
